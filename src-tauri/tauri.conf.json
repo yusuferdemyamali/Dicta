@@ -1,0 +1,33 @@
+{
+  "productName": "Dikte",
+  "version": "0.1.0",
+  "identifier": "com.dikte.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Dikte Settings",
+        "width": 560,
+        "height": 600,
+        "resizable": true,
+        "visible": false,
+        "label": "settings"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}

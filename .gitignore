@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Tauri / Rust
+src-tauri/target/
+# Keep Cargo.lock for binary (Tauri app) - commit for reproducible builds
+# src-tauri/Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Vite
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Whisper models (downloaded to %LOCALAPPDATA% at runtime, not repo)
+*.bin
+*.ggml
+*.onnx
+models/
+src-tauri/models/
+
+# Audio temp (normal flow keeps audio in memory only)
+*.wav
+*.mp3
+*.m4a
+
+# Env & secrets (API key never in repo per mainspec 15)
+.env
+.env.local
+.env.*.local
+*.env
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Logs (mainspec 31: %LOCALAPPDATA%/logs/app.log, keep local only)
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+/src-tauri/*.log
+
+# Coverage / Testing
+coverage/
+.nyc_output/
+.coverage/
+
+# Installer artifacts (Tauri bundle)
+src-tauri/bundle/
+*.msi
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.dmg
+
+# Temp
+tmp/
+temp/
+.tmp/
+.opencode/tmp/

@@ -1,0 +1,7 @@
+pub mod audio;
+pub mod feedback;
+pub mod hotkey;
+pub mod settings;
+pub mod startup;
+pub mod text_output;
+pub mod transcription;

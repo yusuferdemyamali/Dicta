@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dikte Settings</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Dikte</h1>
+      <p class="subtitle">Windows AI Dictation — Settings</p>
+
+      <section class="card">
+        <h2>General</h2>
+        <label class="row">
+          <input type="checkbox" id="startWithWindows" />
+          <span>Start with Windows</span>
+        </label>
+        <p class="hint">Enabled by default. Uses user-level autostart.</p>
+        <div class="status" id="autostartStatus" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>Shortcut</h2>
+        <div class="shortcut-display">
+          <code>Ctrl + Alt + Space</code>
+          <span class="badge">Fixed</span>
+        </div>
+        <p class="hint">Press Ctrl + Alt + Space to toggle recording (Idle → Recording → Transcribing).</p>
+        <div class="status" id="hotkeyStatus" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>Status</h2>
+        <div id="appStatus" class="app-status">Idle</div>
+        <div id="lastError" class="error" aria-live="polite"></div>
+      </section>
+
+      <div class="actions">
+        <button id="saveBtn" type="button">Save</button>
+        <button id="closeBtn" type="button" class="secondary">Close</button>
+      </div>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
