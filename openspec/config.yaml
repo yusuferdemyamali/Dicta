@@ -1,0 +1,28 @@
+schema: spec-driven
+
+context: |
+  Product: Windows 10/11 x64 AI dictation app.
+  Stack: Tauri 2, Rust, Vanilla TypeScript/HTML/CSS.
+  Linux is development-only; Windows is the product target.
+  mainspec.md is the product source of truth.
+  Keep architecture simple and MVP scope narrow.
+  Consult mainspec.md only when the active change needs product details
+  not already captured in the change artifacts or this context.
+
+rules:
+  proposal:
+    - Use mainspec.md as authoritative product guidance when relevant.
+    - Keep each change focused on one meaningful product capability.
+    - Do not add unrequested future features or abstractions.
+
+  specs:
+    - Describe observable behavior and acceptance scenarios.
+    - Do not expand beyond the approved proposal.
+
+  design:
+    - Prefer the simplest implementation that satisfies the spec.
+    - Avoid unnecessary layers, frameworks, services, and abstractions.
+
+  tasks:
+    - Keep tasks concrete, ordered, and implementation-ready.
+    - Do not include work outside the approved change scope.
