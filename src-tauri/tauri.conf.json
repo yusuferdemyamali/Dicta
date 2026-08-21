@@ -1,5 +1,5 @@
 {
-  "productName": "Dikte",
+  "productName": "Dicta",
   "version": "0.1.0",
   "identifier": "com.dikte.app",
   "build": {
@@ -11,7 +11,7 @@
   "app": {
     "windows": [
       {
-        "title": "Dikte Settings",
+        "title": "Dicta Settings",
         "width": 560,
         "height": 600,
         "resizable": true,

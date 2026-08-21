@@ -1,0 +1,101 @@
+name: Release Windows
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (e.g. v0.1.0)"
+        required: true
+        default: "v0.1.0"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source for release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Show current tag / commit
+        shell: bash
+        run: |
+          echo "Inputs tag: ${{ inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          git log --oneline -3
+          cat src-tauri/tauri.conf.json | head -n 20
+          cat src-tauri/Cargo.toml | head -n 10
+          cat package.json | grep version
+
+      - name: Fix product name for legacy tag (Dikte -> Dicta)
+        shell: bash
+        run: |
+          if grep -q '"productName": "Dikte"' src-tauri/tauri.conf.json; then
+            echo "Patching productName Dikte -> Dicta for legacy v0.1.0 tag"
+            sed -i 's/"productName": "Dikte"/"productName": "Dicta"/' src-tauri/tauri.conf.json
+            sed -i 's/"title": "Dikte Settings"/"title": "Dicta Settings"/' src-tauri/tauri.conf.json
+          fi
+          echo "Effective tauri.conf.json:"
+          cat src-tauri/tauri.conf.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install frontend dependencies
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build Tauri app (NSIS installer)
+        shell: bash
+        run: |
+          npx tauri build --bundles nsis
+
+      - name: List bundle output
+        shell: bash
+        run: |
+          ls -R src-tauri/target/release/bundle || true
+          find src-tauri/target/release/bundle -type f | head -n 30
+
+      - name: Upload installer to existing GitHub Release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          echo "Uploading installer to release: $TAG"
+          installer=$(find src-tauri/target/release/bundle -name "*.exe" -type f | head -n 1)
+          if [ -z "$installer" ]; then
+            echo "ERROR: No .exe installer found under src-tauri/target/release/bundle"
+            exit 1
+          fi
+          echo "Found installer: $installer"
+          ls -lh "$installer"
+          # Use gh to upload to existing release, overwrite if exists
+          gh release upload "$TAG" "$installer" --clobber
+          echo "Upload completed"
+          gh release view "$TAG" --json assets --jq '.assets[].name'
