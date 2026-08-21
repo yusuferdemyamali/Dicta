@@ -140,15 +140,48 @@ impl AppState {
             return;
         }
 
-        // Cleaning state remains but no AI cleanup in this change - skip to Inserting
-        // Explicitly keep Cleaning enum variant for spec compliance but don't enter remote work
-        // If we wanted to show Cleaning state, we could briefly set it, but offline flow is Transcribing -> Inserting
-        // So directly go to Inserting
+        // Enter Cleaning state before insertion
+        *state.dictation_state.lock().unwrap() = DictationState::Cleaning;
+        feedback::update_tray_for_state(&app, DictationState::Cleaning);
+        println!("Cleaning started");
+
+        // Attempt OpenCode Zen cleanup with fallback to raw transcript.
+        // Never log transcript content or API key.
+        let final_text = {
+            let settings_clone = state.settings.lock().unwrap().clone();
+            let model_id = settings_clone.model_id.clone();
+            match crate::services::credentials::load_api_key() {
+                None => {
+                    println!("Cleanup skipped: no API key, using raw transcript");
+                    println!("Raw transcript fallback used");
+                    transcript.clone()
+                }
+                Some(api_key) => {
+                    match crate::services::cleanup::cleanup_blocking(
+                        &transcript,
+                        &model_id,
+                        &api_key,
+                    ) {
+                        Ok(cleaned) => {
+                            println!("Cleanup completed");
+                            cleaned
+                        }
+                        Err(e) => {
+                            // Technical event only, no transcript/key
+                            eprintln!("Cleanup request failed: {}", e);
+                            println!("Raw transcript fallback used");
+                            transcript.clone()
+                        }
+                    }
+                }
+            }
+        };
+
         *state.dictation_state.lock().unwrap() = DictationState::Inserting;
         feedback::update_tray_for_state(&app, DictationState::Inserting);
 
         // Text output: clipboard + Ctrl+V on Windows, fallback on Linux
-        match text_output::insert_text(&transcript) {
+        match text_output::insert_text(&final_text) {
             Ok(_) => {
                 println!("text inserted");
                 *state.last_error.lock().unwrap() = None;

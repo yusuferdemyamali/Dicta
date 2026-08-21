@@ -1,4 +1,6 @@
 pub mod audio;
+pub mod cleanup;
+pub mod credentials;
 pub mod feedback;
 pub mod hotkey;
 pub mod settings;

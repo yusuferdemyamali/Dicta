@@ -12,6 +12,25 @@
       <p class="subtitle">Windows AI Dictation — Settings</p>
 
       <section class="card">
+        <h2>OpenCode Zen</h2>
+        <label class="field">
+          <span class="field-label">API Key</span>
+          <input type="password" id="apiKey" placeholder="Enter OpenCode Zen API key" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="field-row">
+          <span class="hint" id="apiKeyStatus">Not set</span>
+          <button type="button" id="clearApiKeyBtn" class="secondary small">Clear</button>
+        </div>
+        <p class="hint">Stored securely (Windows Credential Manager). Never in settings JSON.</p>
+        <label class="field">
+          <span class="field-label">Model ID</span>
+          <input type="text" id="modelId" placeholder="deepseek-v4-flash-free" spellcheck="false" />
+        </label>
+        <p class="hint">Editable. Default: <code>deepseek-v4-flash-free</code>. Provider is fixed: OpenCode Zen.</p>
+        <div class="status" id="zenStatus" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
         <h2>General</h2>
         <label class="row">
           <input type="checkbox" id="startWithWindows" />
@@ -27,7 +46,7 @@
           <code>Ctrl + Alt + Space</code>
           <span class="badge">Fixed</span>
         </div>
-        <p class="hint">Press Ctrl + Alt + Space to toggle recording (Idle → Recording → Transcribing).</p>
+        <p class="hint">Fixed shortcut. Press Ctrl + Alt + Space to toggle recording (Idle → Recording → Transcribing → Cleaning).</p>
         <div class="status" id="hotkeyStatus" aria-live="polite"></div>
       </section>
 

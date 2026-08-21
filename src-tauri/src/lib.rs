@@ -20,13 +20,18 @@ fn save_settings(
     app: tauri::AppHandle,
     settings: services::settings::Settings,
 ) -> Result<(), String> {
+    // Ensure model_id defaults if empty (preserve existing files)
+    let mut normalized = settings.clone();
+    if normalized.model_id.trim().is_empty() {
+        normalized.model_id = services::cleanup::DEFAULT_MODEL.to_string();
+    }
     let mut guard = state.settings.lock().unwrap();
-    *guard = settings.clone();
+    *guard = normalized.clone();
     guard.save().map_err(|e| e.to_string())?;
     drop(guard);
 
     // Apply autostart setting without crashing
-    if let Err(e) = startup::apply_autostart(&app, settings.start_with_windows) {
+    if let Err(e) = startup::apply_autostart(&app, normalized.start_with_windows) {
         let mut err = state.last_error.lock().unwrap();
         *err = Some(format!("Autostart update failed: {}", e));
         eprintln!("autostart error: {}", e);
@@ -40,6 +45,27 @@ fn save_settings(
         }
     }
     Ok(())
+}
+
+#[tauri::command]
+fn save_api_key(api_key: String) -> Result<(), String> {
+    // Never log the key value
+    services::credentials::save_api_key(&api_key).map_err(|e| e.to_string())?;
+    println!(
+        "API key saved (has_key={})",
+        services::credentials::has_api_key()
+    );
+    Ok(())
+}
+
+#[tauri::command]
+fn has_api_key() -> bool {
+    services::credentials::has_api_key()
+}
+
+#[tauri::command]
+fn get_api_key_status() -> bool {
+    services::credentials::has_api_key()
 }
 
 #[tauri::command]
@@ -115,6 +141,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_settings,
             save_settings,
+            save_api_key,
+            has_api_key,
+            get_api_key_status,
             get_app_status
         ])
         .setup(move |app| {
